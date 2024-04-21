@@ -1,0 +1,11 @@
+.sectionFlex {
+  display: flex;
+  flex-direction: column;
+
+  border: 2px solid gray;
+  width: 400px;
+  border-radius: 8px;
+  margin: 0 auto;
+  padding: 10px;
+  gap: 6px;
+}
