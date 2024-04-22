@@ -5,48 +5,42 @@ import ContactFilter from './ContactFilter/ContactFilter';
 import Section from './Section/Section';
 
 export const App = () => {
-  const defState = { contacts: [], filter: '' };
-  const [value, setValue] = useState(defState);
-
-  useEffect(() => {
+  const [contacts, setContacts] = useState(() => {
     const localStorageData = localStorage.getItem('contacts');
-    if (localStorageData) {
-      setValue({ ...value, contacts: JSON.parse(localStorageData) });
-    }
-  }, []);
+    return localStorageData ? JSON.parse(localStorageData) : [];
+  });
+  const [filter, setFilter] = useState('');
 
   useEffect(() => {
-    localStorage.setItem('contacts', JSON.stringify(value.contacts));
-  }, [value.contacts]);
+    localStorage.setItem('contacts', JSON.stringify(contacts));
+  }, [contacts]);
 
   const handleContactSubmit = contact => {
-    const sameContact = value.contacts.find(
+    const sameContact = contacts.find(
       e => e.name.toLowerCase() === contact.name.toLowerCase()
     );
     if (sameContact) {
       alert(`${contact.name} is already in Contacts`);
     } else {
-      setValue(prev => ({
-        ...prev,
-        contacts: [...prev.contacts, contact],
-      }));
+      setContacts(prev => [...prev, contact]);
     }
   };
 
   const handleDeleteContact = contactId => {
-    setValue(prev => ({
-      ...prev,
-      contacts: prev.contacts.filter(contact => contact.id !== contactId),
-    }));
+    setContacts(prev => prev.filter(contact => contact.id !== contactId));
   };
 
   const handleFilterChange = e => {
-    setValue({ ...value, filter: e.target.value });
+    setFilter(e.target.value);
   };
 
-  const getFilteredContacts = value.contacts.filter(contact =>
-    contact.name.toLowerCase().includes(value.filter.toLowerCase())
-  );
+  const getFilteredContacts = () => {
+    return contacts.filter(contact =>
+      contact.name.toLowerCase().includes(filter.toLowerCase())
+    );
+  };
+
+  const filteredContacts = getFilteredContacts();
 
   return (
     <div
@@ -68,9 +62,9 @@ export const App = () => {
       </Section>
 
       <Section title="Contacts">
-        <ContactFilter filter={value.filter} onChange={handleFilterChange} />
+        <ContactFilter filter={filter} onChange={handleFilterChange} />
         <ContactList
-          contacts={getFilteredContacts}
+          contacts={filteredContacts}
           onDeleteContact={handleDeleteContact}
         />
       </Section>
